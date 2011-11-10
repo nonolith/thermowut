@@ -40,39 +40,39 @@ void initADC(void){
 
 /* configure SPI on USARTE0 for communicating with the MAX31855 thermocouple sensor */
 void initSPI(void){
-	PORTC.DIRSET = 1 << 0 | 1 << 1; //CS, SCK as outputs
-	USARTC0.CTRLC = USART_CMODE_MSPI_gc | 1 << 1; // SPI master, MSB first, sample on falling clock (UCPHA=1)
-	USARTC0.BAUDCTRLA = 15;  // 1MHz SPI clock. XMEGA AU manual 23.15.6 & 23.3.1
-	USARTC0.BAUDCTRLB =  0;
-	USARTC0.CTRLB = USART_TXEN_bm | USART_RXEN_bm; // enable TX
-	PORTC.OUTCLR = 1 << 1; // SCK low
-	PORTC.OUTSET = 1 << 0; // CS high
+	PORTD.DIRSET = 1 << 0 | 1 << 1; //CS, SCK as outputs
+	USARTD0.CTRLC = USART_CMODE_MSPI_gc | 1 << 1; // SPI master, MSB first, sample on falling clock (UCPHA=1)
+	USARTD0.BAUDCTRLA = 15;  // 1MHz SPI clock. XMEGA AU manual 23.15.6 & 23.3.1
+	USARTD0.BAUDCTRLB =  0;
+	USARTD0.CTRLB = USART_TXEN_bm | USART_RXEN_bm; // enable TX
+	PORTD.OUTCLR = 1 << 1; // SCK low
+	PORTD.OUTSET = 1 << 0; // CS high
 }
 
 /* return a 16b value containing the 14b temperature reading */
 void readSPI(void){
 
-	PORTC.OUTCLR = 1 << 0; // CS low
+	PORTD.OUTCLR = 1 << 0; // CS low
 	_delay_us(10);
-	USARTC0.DATA = 0x00;
-	while(!(USARTC0.STATUS & USART_DREIF_bm)); // wait until we can write another byte
-	USARTC0.STATUS = USART_TXCIF_bm; // clear TX complete flag
-	ep0_buf_in[0] = USARTC0.DATA;
+	USARTD0.DATA = 0x00;
+	while(!(USARTD0.STATUS & USART_DREIF_bm)); // wait until we can write another byte
+	USARTD0.STATUS = USART_TXCIF_bm; // clear TX complete flag
+	ep0_buf_in[0] = USARTD0.DATA;
 
-	USARTC0.DATA = 0x00;
-	while(!(USARTC0.STATUS & USART_DREIF_bm)); // wait for TX complete flag
-	USARTC0.STATUS = USART_TXCIF_bm;
-	ep0_buf_in[1] = USARTC0.DATA;
+	USARTD0.DATA = 0x00;
+	while(!(USARTD0.STATUS & USART_DREIF_bm)); // wait for TX complete flag
+	USARTD0.STATUS = USART_TXCIF_bm;
+	ep0_buf_in[1] = USARTD0.DATA;
 	
-	USARTC0.DATA = 0x00;
-	while(!(USARTC0.STATUS & USART_DREIF_bm)); // wait for TX complete flag
-	USARTC0.STATUS = USART_TXCIF_bm;
-	ep0_buf_in[2] = USARTC0.DATA;
+	USARTD0.DATA = 0x00;
+	while(!(USARTD0.STATUS & USART_DREIF_bm)); // wait for TX complete flag
+	USARTD0.STATUS = USART_TXCIF_bm;
+	ep0_buf_in[2] = USARTD0.DATA;
 	
-	USARTC0.DATA = 0x00;
+	USARTD0.DATA = 0x00;
 	while(!(USARTC0.STATUS & USART_DREIF_bm)); // wait for TX complete flag
-	USARTC0.STATUS = USART_TXCIF_bm;
-	ep0_buf_in[3] = USARTC0.DATA;
+	USARTD0.STATUS = USART_TXCIF_bm;
+	ep0_buf_in[3] = USARTD0.DATA;
 	
 	_delay_us(10);	
 	PORTC.OUTSET = 1 << 0; // CS high
