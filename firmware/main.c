@@ -38,7 +38,6 @@ void initADC(void){
     ADCA.CTRLA = ADC_ENABLE_bm;
 }
 
-/* configure SPI on USARTE0 for communicating with the MAX31855 thermocouple sensor */
 void initSPI(void){
 	PORTD.DIRSET = 1 << 0 | 1 << 1; //CS, SCK as outputs
 	USARTD0.CTRLC = USART_CMODE_MSPI_gc | 1 << 1; // SPI master, MSB first, sample on falling clock (UCPHA=1)
@@ -49,11 +48,9 @@ void initSPI(void){
 	PORTD.OUTSET = 1 << 0; // CS high
 }
 
-/* return a 16b value containing the 14b temperature reading */
 void readSPI(void){
 
 	PORTD.OUTCLR = 1 << 0; // CS low
-	_delay_us(10);
 	USARTD0.DATA = 0x00;
 	while(!(USARTD0.STATUS & USART_DREIF_bm)); // wait until we can write another byte
 	USARTD0.STATUS = USART_TXCIF_bm; // clear TX complete flag
@@ -70,12 +67,11 @@ void readSPI(void){
 	ep0_buf_in[2] = USARTD0.DATA;
 	
 	USARTD0.DATA = 0x00;
-	while(!(USARTC0.STATUS & USART_DREIF_bm)); // wait for TX complete flag
+	while(!(USARTD0.STATUS & USART_TXCIF_bm)); // wait for TX complete flag
 	USARTD0.STATUS = USART_TXCIF_bm;
 	ep0_buf_in[3] = USARTD0.DATA;
 	
-	_delay_us(10);	
-	PORTC.OUTSET = 1 << 0; // CS high
+	PORTD.OUTSET = 1 << 0; // CS high
 }
 
 void configHardware(void){
